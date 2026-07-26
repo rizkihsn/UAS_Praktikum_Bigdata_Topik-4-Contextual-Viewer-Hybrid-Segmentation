@@ -1,0 +1,34 @@
+# =========================================
+# .gitignore - lab_bigdata_rizkihasan
+# UAS Big Data - Topik 4 (Rizki Hasan)
+# =========================================
+
+# Dataset besar (melebihi batas 100MB GitHub)
+*.csv
+!output/silhouette_scores.csv
+!output/business_summary.txt
+
+# Parquet & binary data
+*.parquet
+*.gz
+*.tar
+*.zip
+
+# File sementara Python
+__pycache__/
+*.py[cod]
+*.pyo
+.env
+.venv/
+*.egg-info/
+
+# File sementara Windows
+Thumbs.db
+desktop.ini
+
+# File Jupyter Notebook checkpoint
+.ipynb_checkpoints/
+
+# File log
+*.log
+hasil.txt

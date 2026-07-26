@@ -1,0 +1,71 @@
+========================================================================
+  CONTEXTUAL VIEWER HYBRID SEGMENTATION
+  Business Insight Report - Rizki Hasan (UAS Big Data)
+========================================================================
+  Tanggal Analisis : 2026-07-26 21:14:32
+  Total Data       : 3,961,105 records
+  Jumlah Cluster   : 2 segmen
+========================================================================
+========================================================================
+  CLUSTER 0: "Free-Tier Mobile Web Casual Viewer"
+  Jumlah Anggota: 3,961,104 (100.0% dari total)
+========================================================================
+
+  [PERILAKU MENONTON]
+    Rata-rata Durasi Menonton : 75.31 detik
+    Completion Rate           : 23.60%
+    Autoplay Rate             : 8.70%
+    Login Rate                : 1.09%
+
+  [PLATFORM & TEKNOLOGI]
+    Platform Dominan          : web-mobile
+    Top 3 Platform            : web-mobile (90.3%), web-desktop (9.5%), app-android (0.2%)
+    Operating System          : Android
+    Playback Location         : embed
+
+  [PREFERENSI KONTEN]
+    Kategori Dominan          : Entertainment
+    Top 3 Kategori            : Entertainment (35.7%), News (34.7%), Sports (12.8%)
+
+  [MONETISASI]
+    Premium Rate              : 0.06%
+    Ad Exposure Rate          : 97.84%
+
+  [REKOMENDASI BISNIS]
+    1. FREEMIUM OPTIMIZATION: Optimalkan UX video player gratis agar lebih interaktif.
+    2. CONTENT CURATION: Tingkatkan kurasi dan kualitas tayangan utama.
+    3. ADVERTISING OPTIMIZATION: Maksimalkan revenue iklan dengan format rewarded/non-skippable.
+    4. PUSH NOTIFICATION: Gunakan push notification terjadwal sesuai kategori kesukaan.
+    5. LOGIN INCENTIVE: Batasi riwayat playlist jika belum login sebagai pendorong pendaftaran.
+
+========================================================================
+  CLUSTER 1: "Free-Tier Mobile Web Casual Viewer"
+  Jumlah Anggota: 1 (0.0% dari total)
+========================================================================
+
+  [PERILAKU MENONTON]
+    Rata-rata Durasi Menonton : 120.00 detik
+    Completion Rate           : 0.00%
+    Autoplay Rate             : 0.00%
+    Login Rate                : 0.00%
+
+  [PLATFORM & TEKNOLOGI]
+    Platform Dominan          : web-mobile
+    Top 3 Platform            : web-mobile (100.0%)
+    Operating System          : TECHNIKA
+    Playback Location         : direct
+
+  [PREFERENSI KONTEN]
+    Kategori Dominan          : Movies
+    Top 3 Kategori            : Movies (100.0%)
+
+  [MONETISASI]
+    Premium Rate              : 0.00%
+    Ad Exposure Rate          : 100.00%
+
+  [REKOMENDASI BISNIS]
+    1. FREEMIUM OPTIMIZATION: Optimalkan UX video player gratis agar lebih interaktif.
+    2. CONTENT OPTIMIZATION: Completion rate rendah, kurangi durasi video atau kembangkan short-form.
+    3. ADVERTISING OPTIMIZATION: Maksimalkan revenue iklan dengan format rewarded/non-skippable.
+    4. PUSH NOTIFICATION: Gunakan push notification terjadwal sesuai kategori kesukaan.
+    5. LOGIN INCENTIVE: Batasi riwayat playlist jika belum login sebagai pendorong pendaftaran.
