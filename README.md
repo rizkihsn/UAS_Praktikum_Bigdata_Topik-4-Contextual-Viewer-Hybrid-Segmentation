@@ -1,244 +1,624 @@
-# Contextual Viewer Hybrid Segmentation
-## UAS Praktikum Big Data — Topik 4
+# 🎥 UAS Praktikum Big Data
+# Contextual Viewer Hybrid Segmentation using Distributed K-Means Clustering
 
-### 📋 Deskripsi Project
+![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
+![Apache Spark](https://img.shields.io/badge/Apache%20Spark-3.x-orange.svg)
+![Docker](https://img.shields.io/badge/Docker-Enabled-blue.svg)
+![Hadoop](https://img.shields.io/badge/Hadoop-HDFS-yellowgreen.svg)
+![Hive](https://img.shields.io/badge/Hive-Data%20Warehouse-yellow.svg)
+![Kafka](https://img.shields.io/badge/Kafka-Streaming-black.svg)
+![License](https://img.shields.io/badge/License-Academic-success.svg)
 
-Project ini melakukan **segmentasi pengguna** platform video streaming (VideoDotCom) berdasarkan perilaku menonton, kategori konten, platform, sistem operasi, dan status premium menggunakan **High-Dimensional Clustering** pada lingkungan **Big Data** terdistribusi.
+## 📌 Deskripsi Proyek
 
-Seluruh proses dijalankan menggunakan **Apache Spark MLlib** di atas infrastruktur **Docker + Hadoop HDFS + Spark Cluster**.
+**Contextual Viewer Hybrid Segmentation** merupakan proyek **Ujian Akhir Semester (UAS) Praktikum Big Data** yang bertujuan melakukan segmentasi pengguna platform video streaming berdasarkan perilaku menonton (viewer behavior) menggunakan algoritma **Distributed K-Means Clustering** pada lingkungan **Big Data**.
 
----
+Proyek ini mengimplementasikan pipeline analisis data secara end-to-end menggunakan **Apache Spark MLlib**, **Hadoop HDFS**, dan **Docker** sehingga mampu memproses dataset berskala besar secara terdistribusi.
 
-### 💼 Business Case
-
-Perusahaan video streaming perlu memahami segmen penggunanya agar dapat:
-- Mengoptimalkan strategi monetisasi (premium vs iklan).
-- Mempersonalisasi rekomendasi konten.
-- Meningkatkan retensi dan engagement pengguna.
-- Mengalokasikan budget marketing secara efisien per segmen.
-
-Dengan melakukan clustering terhadap jutaan data perilaku menonton, perusahaan dapat mengidentifikasi pola-pola tersembunyi dan mengambil keputusan berbasis data.
+Hasil segmentasi pengguna dimanfaatkan untuk membantu perusahaan memahami karakteristik setiap kelompok pengguna sehingga dapat digunakan sebagai dasar dalam pengambilan keputusan bisnis seperti personalisasi rekomendasi konten, strategi pemasaran, optimasi iklan, hingga peningkatan retensi pelanggan.
 
 ---
 
-### 🎯 Tujuan
+# 📚 Daftar Isi
 
-1. Membangun pipeline Big Data end-to-end menggunakan Apache Spark MLlib.
-2. Melakukan preprocessing dan feature engineering pada data berskala besar.
-3. Menerapkan algoritma **Distributed K-Means Clustering**.
-4. Mengevaluasi model menggunakan **Silhouette Score**.
-5. Menghasilkan insight bisnis dan rekomendasi strategi per segmen pengguna.
-
----
-
-### 📊 Dataset
-
-| Atribut | Detail |
-|---------|--------|
-| **Nama** | VideoDotCom Viewer Dataset |
-| **Format** | CSV |
-| **Jumlah Kolom** | 41 kolom (videodotcom_big.csv) |
-| **Jumlah Baris** | ~7 juta+ (videodotcom_big.csv) |
-
-**Kolom yang digunakan sebagai fitur:**
-
-| Kolom | Tipe | Peran |
-|-------|------|-------|
-| `is_login` | Boolean | Status login pengguna |
-| `platform` | String | Platform akses (app-android, web-mobile, dll.) |
-| `playback_location` | String | Lokasi playback (direct, embed) |
-| `completed` | Boolean | Apakah konten ditonton sampai selesai |
-| `has_ad` | Boolean | Apakah ada iklan |
-| `is_premium` | Boolean | Status premium pengguna |
-| `play_duration` | Integer | Durasi menonton (detik) |
-| `autoplay` | Boolean | Apakah autoplay aktif |
-| `content_type` | String | Tipe konten (vod, catchup, dll.) |
-| `category_name` | String | Kategori konten (Movies, News, Sports, dll.) |
+- [Business Case](#-business-case)
+- [Tujuan Proyek](#-tujuan-proyek)
+- [Arsitektur Sistem](#-arsitektur-sistem)
+- [Teknologi yang Digunakan](#-teknologi-yang-digunakan)
+- [Dataset](#-dataset)
+- [Struktur Repository](#-struktur-repository)
+- [Pipeline Project](#-pipeline-project)
+- [Cara Menjalankan Proyek](#-cara-menjalankan-proyek)
+- [Output Project](#-output-project)
+- [Business Insight](#-business-insight)
+- [Author](#-author)
 
 ---
 
-### 🛠️ Tech Stack
+# 💼 Business Case
+
+Perusahaan video streaming setiap harinya menghasilkan jutaan data aktivitas pengguna, seperti durasi menonton, perangkat yang digunakan, kategori konten favorit, status premium, lokasi akses, hingga interaksi pengguna terhadap iklan.
+
+Volume data yang sangat besar menyebabkan perusahaan mengalami kesulitan dalam mengidentifikasi pola perilaku pengguna apabila hanya menggunakan analisis konvensional.
+
+Melalui pendekatan **Big Data Analytics**, data pengguna dapat diproses secara paralel menggunakan Apache Spark sehingga memungkinkan proses segmentasi pengguna berjalan lebih cepat dan efisien.
+
+Hasil segmentasi ini memberikan informasi penting mengenai karakteristik masing-masing kelompok pengguna sehingga perusahaan dapat menyusun strategi bisnis yang lebih tepat sasaran.
+
+Beberapa manfaat yang diperoleh antara lain:
+
+- Personalisasi rekomendasi konten.
+- Optimalisasi strategi pemasaran.
+- Peningkatan retensi pengguna.
+- Optimasi penempatan iklan.
+- Analisis perilaku pengguna premium dan non-premium.
+- Pengambilan keputusan berbasis data (Data-Driven Decision Making).
+
+---
+
+# 🎯 Tujuan Proyek
+
+Tujuan utama proyek ini adalah:
+
+- Membangun pipeline Big Data menggunakan Apache Spark.
+- Memproses dataset viewer behavior dalam skala besar menggunakan Hadoop HDFS.
+- Melakukan preprocessing dan feature engineering terhadap data pengguna.
+- Mengimplementasikan algoritma Distributed K-Means Clustering menggunakan Spark MLlib.
+- Menentukan jumlah cluster terbaik menggunakan metode Silhouette Score.
+- Menghasilkan visualisasi karakteristik setiap cluster.
+- Menyusun business insight berdasarkan hasil clustering.
+
+---
+
+# 🏗 Arsitektur Sistem
+
+Pipeline pada proyek ini dibangun menggunakan beberapa komponen Big Data yang saling terintegrasi.
+
+```text
+                        +----------------------+
+                        |   VideoDotCom CSV    |
+                        +----------+-----------+
+                                   |
+                                   |
+                             Upload ke HDFS
+                                   |
+                                   ▼
+                        +----------------------+
+                        |   Hadoop HDFS        |
+                        +----------+-----------+
+                                   |
+                                   ▼
+                        +----------------------+
+                        | Apache Spark MLlib   |
+                        |  (Spark Cluster)     |
+                        +----------+-----------+
+                                   |
+               +-------------------+------------------+
+               |                                      |
+               ▼                                      ▼
+      Feature Engineering                  Distributed K-Means
+               |                                      |
+               +-------------------+------------------+
+                                   |
+                                   ▼
+                        Silhouette Evaluation
+                                   |
+                                   ▼
+                           Visualization
+                                   |
+                                   ▼
+                         Business Insight
+```
+
+Seluruh proses analisis dijalankan secara terdistribusi menggunakan Apache Spark sehingga mampu menangani dataset berukuran jutaan baris dengan performa yang lebih baik dibandingkan pemrosesan konvensional.
+
+---
+
+# 🛠 Teknologi yang Digunakan
 
 | Teknologi | Fungsi |
 |-----------|--------|
-| **Apache Spark** | Distributed computing engine |
-| **PySpark** | Python API untuk Apache Spark |
-| **Spark MLlib** | Library machine learning terdistribusi |
-| **Hadoop HDFS** | Distributed file system |
-| **Docker** | Containerized environment |
-| **Python** | Bahasa pemrograman utama |
-| **Pandas** | Data manipulation untuk visualisasi |
-| **Matplotlib** | Library visualisasi grafik |
-| **Seaborn** | Library visualisasi statistik |
+| Apache Spark | Distributed Data Processing |
+| Spark MLlib | Machine Learning Library |
+| Hadoop HDFS | Distributed Storage |
+| Docker | Containerization |
+| Docker Compose | Orkestrasi Container |
+| Hive | Data Warehouse |
+| MySQL | Metadata Database |
+| MongoDB | NoSQL Database |
+| Kafka | Streaming Platform |
+| ZooKeeper | Kafka Coordination |
+| Pandas | Data Analysis |
+| NumPy | Numerical Computing |
+| Matplotlib | Data Visualization |
+| Seaborn | Statistical Visualization |
+| PySpark | Python API untuk Apache Spark |
 
 ---
 
-### 📁 Struktur Folder
+# 📂 Dataset
 
-```
-lab_bigdata_rizkihasan/
-│
-├── README.md                    # Dokumentasi project (file ini)
-├── requirements.txt             # Daftar dependensi Python
-├── docker-compose.yml           # Orkestrasi container Docker
-├── hadoop.env                   # Konfigurasi environment Hadoop
-├── preprocessing.ipynb          # Notebook eksplorasi (referensi)
-│
-├── videodotcom1.csv             # Dataset utama
-├── videodotcom_big.csv          # Dataset besar (opsional)
+Dataset yang digunakan merupakan dataset aktivitas pengguna platform video streaming (**VideoDotCom Viewer Dataset**) yang berisi jutaan data perilaku pengguna.
+
+Dataset memiliki karakteristik sebagai berikut.
+
+| Informasi | Keterangan |
+|------------|------------|
+| Jenis Dataset | Viewer Behavior |
+| Format | CSV |
+| Jumlah Baris | ±7 Juta Data |
+| Jumlah Kolom | 41 Kolom |
+| Penyimpanan | Hadoop HDFS |
+
+Beberapa fitur yang digunakan dalam proses clustering antara lain:
+
+- Platform
+- Playback Location
+- Play Duration
+- Premium User
+- Content Type
+- Category Name
+- Has Advertisement
+- Autoplay
+- Completed
+- Login Status
+
+Dataset diproses menggunakan Spark DataFrame sehingga mampu menangani data dalam skala besar secara efisien.
+
+---
+# 📁 Struktur Repository
+
+Berikut merupakan struktur repository proyek yang digunakan.
+
+```text
+UAS_Praktikum_Bigdata_Topik-4-Contextual-Viewer-Hybrid-Segmentation/
 │
 ├── src/
-│   └── pipeline.py              # Berkas pipeline tunggal (Preprocessing, Clustering, Visualisasi, Bisnis)
+│   └── pipeline.py                 # Pipeline utama Spark MLlib
 │
-└── output/
-    ├── cluster_result.csv       # Dataset dengan label cluster
-    ├── silhouette_scores.csv    # Evaluasi Silhouette Score per K
-    ├── silhouette_vs_k.png      # Grafik Silhouette Score vs K
-    ├── cluster_distribution.png # Grafik distribusi anggota cluster
-    ├── multi_dimensional_cluster_profile.png      # Heatmap profil fitur per cluster
-    └── business_summary.txt     # Laporan insight bisnis
+├── output/
+│   ├── cluster_result.csv
+│   ├── silhouette_scores.csv
+│   ├── silhouette_vs_k.png
+│   ├── cluster_distribution.png
+│   ├── multi_dimensional_cluster_profile.png
+│   └── business_summary.txt
+│
+├── docker-compose.yml              # Konfigurasi seluruh container
+├── hadoop.env                      # Environment Hadoop
+├── requirements.txt                # Dependency Python
+├── README.md
+│
+└── dataset/
+    └── videodotcom_big.csv         # Dataset (tidak disertakan karena ukuran besar)
+```
+
+> **Catatan:** Dataset tidak disertakan di dalam repository karena ukurannya sangat besar (±7 juta data). Silakan menempatkan dataset pada direktori yang sesuai sebelum proses upload ke HDFS.
+
+---
+
+# 🔄 Pipeline Project
+
+Seluruh proses analisis telah diintegrasikan ke dalam satu pipeline utama yaitu:
+
+```text
+src/pipeline.py
+```
+
+Pipeline tersebut menjalankan seluruh tahapan analisis secara otomatis mulai dari membaca data hingga menghasilkan insight bisnis.
+
+Alur pipeline adalah sebagai berikut.
+
+```text
+VideoDotCom Dataset
+        │
+        ▼
+Load Data dari HDFS
+        │
+        ▼
+Data Cleaning
+        │
+        ▼
+Feature Engineering
+(StringIndexer + OneHotEncoder)
+        │
+        ▼
+VectorAssembler
+        │
+        ▼
+StandardScaler
+        │
+        ▼
+Distributed K-Means Clustering
+        │
+        ▼
+Silhouette Score Evaluation
+        │
+        ▼
+Visualisasi Hasil
+        │
+        ▼
+Business Insight
+```
+
+Pipeline dijalankan menggunakan Apache Spark sehingga seluruh proses berlangsung secara paralel pada Spark Cluster.
+
+---
+
+# ⚙️ Cara Menjalankan Proyek
+
+## 1. Clone Repository
+
+```bash
+git clone https://github.com/rizkihsn/UAS_Praktikum_Bigdata_Topik-4-Contextual-Viewer-Hybrid-Segmentation.git
+
+cd UAS_Praktikum_Bigdata_Topik-4-Contextual-Viewer-Hybrid-Segmentation
 ```
 
 ---
 
-### 🔄 Pipeline Project
+## 2. Jalankan Docker
 
+Pastikan Docker Desktop telah aktif.
+
+Kemudian jalankan seluruh service.
+
+```bash
+docker compose up -d
 ```
-Dataset (HDFS)
-     │
-     ▼
-preprocessing.py
-  ├── Data Understanding (printSchema, count, describe, missing value, duplicate)
-  ├── Data Cleaning (handle missing values)
-  ├── Feature Engineering (boolean casting)
-  ├── StringIndexer → OneHotEncoder
-  ├── VectorAssembler
-  └── StandardScaler (WAJIB)
-     │
-     ▼
-  Parquet (HDFS)
-     │
-     ▼
-clustering.py
-  ├── Distributed K-Means (K = 2, 3, 4, 5, 6)
-  ├── Silhouette Score evaluation
-  ├── Pilih K optimal
-  └── Simpan cluster_result.csv & silhouette_scores.csv
-     │
-     ▼
-visualization.py
-  ├── silhouette_vs_k.png
-  ├── cluster_distribution.png
-  └── multi_dimensional_cluster_profile.png
-     │
-     ▼
-business_insight.py
-  └── business_summary.txt
+
+Periksa seluruh container.
+
+```bash
+docker ps
+```
+
+Container yang harus aktif:
+
+- Hadoop NameNode
+- Hadoop DataNode
+- Spark Master
+- Spark Worker
+- Hive Server
+- Hive Metastore
+- MySQL
+- MongoDB
+- ZooKeeper
+- Kafka
+- Kafdrop
+
+---
+
+## 3. Install Dependency
+
+```bash
+pip install -r requirements.txt
 ```
 
 ---
 
-### 🚀 Cara Menjalankan
+## 4. Upload Dataset ke HDFS
 
-#### 1. Jalankan Docker
+Masuk ke container Hadoop.
 
 ```bash
-docker-compose up -d
+docker exec -it namenode bash
 ```
 
-Pastikan container `namenode`, `datanode`, `spark-master`, `spark-worker-1`, dan `spark-worker-2` berjalan.
-
-#### 2. Upload Dataset ke HDFS
+Buat direktori pada HDFS.
 
 ```bash
-# Buat direktori di HDFS
-docker exec namenode_rizkihsn hdfs dfs -mkdir -p /user/bigdata/dataset
-
-# Copy dataset ke container
-docker cp videodotcom_big.csv namenode_rizkihsn:/tmp/videodotcom_big.csv
-
-# Upload ke HDFS
-docker exec namenode_rizkihsn hdfs dfs -put -f /tmp/videodotcom_big.csv /user/bigdata/dataset/
+hdfs dfs -mkdir -p /data
 ```
 
-Verifikasi:
+Upload dataset.
+
 ```bash
-docker exec namenode_rizkihsn hdfs dfs -ls /user/bigdata/dataset/
+hdfs dfs -put videodotcom_big.csv /data/
 ```
 
-#### 3. Jalankan Preprocessing
+Pastikan dataset berhasil diunggah.
 
 ```bash
-docker exec spark-master spark-submit \
-  --master spark://spark-master:7077 \
-  /src/preprocessing.py
+hdfs dfs -ls /data
 ```
 
-> **Catatan:** Pastikan folder `src/` ter-mount ke container `spark-master`. Jika belum, tambahkan volume di `docker-compose.yml`:
-> ```yaml
-> spark-master:
->   volumes:
->     - ./src:/src
->     - ./output:/output
-> ```
+Output yang diharapkan.
 
-#### 4. Jalankan Clustering
-
-```bash
-docker exec spark-master spark-submit \
-  --master spark://spark-master:7077 \
-  /src/clustering.py
-```
-
-#### 5. Jalankan Visualization
-6. Ambil hasil output dari container ke lokal host
-
-```bash
-docker cp spark-master:/output/. ./output
-```
-
-7. Jalankan visualization.py secara lokal
-
-```bash
-python src/visualization.py
-```
-
-8. Jalankan business_insight.py secara lokal
-
-```bash
-python src/business_insight.py
+```text
+Found 1 items
+/data/videodotcom_big.csv
 ```
 
 ---
 
-### 📤 Output
+## 5. Jalankan Pipeline Spark
+
+Seluruh proses dijalankan menggunakan satu file utama.
+
+```bash
+spark-submit src/pipeline.py
+```
+
+Apabila menjalankan melalui container Spark Master.
+
+```bash
+docker exec -it spark-master bash
+
+spark-submit /opt/bitnami/spark/src/pipeline.py
+```
+
+---
+
+## 6. Proses yang Dilakukan Pipeline
+
+Pipeline akan menjalankan seluruh tahapan berikut secara otomatis.
+
+### 📌 Data Loading
+
+- Membaca dataset dari Hadoop HDFS.
+- Menggunakan schema yang telah ditentukan agar proses lebih cepat dan konsisten.
+
+---
+
+### 📌 Data Cleaning
+
+Tahapan preprocessing meliputi:
+
+- Menghapus data kosong (null value).
+- Memastikan tipe data sesuai.
+- Memilih atribut yang relevan.
+- Membersihkan data yang tidak valid.
+
+---
+
+### 📌 Feature Engineering
+
+Data kategorikal tidak dapat diproses langsung oleh algoritma K-Means.
+
+Oleh karena itu dilakukan proses:
+
+- StringIndexer
+- OneHotEncoder
+- VectorAssembler
+
+Seluruh fitur kemudian digabung menjadi sebuah feature vector.
+
+---
+
+### 📌 Feature Scaling
+
+Feature vector dinormalisasi menggunakan:
+
+```text
+StandardScaler
+```
+
+Normalisasi dilakukan agar setiap fitur memiliki skala yang seimbang sehingga tidak mendominasi proses clustering.
+
+---
+
+### 📌 Distributed K-Means Clustering
+
+Algoritma K-Means dijalankan menggunakan Spark MLlib.
+
+Percobaan dilakukan pada beberapa nilai cluster.
+
+```text
+K = 2
+K = 3
+K = 4
+K = 5
+K = 6
+```
+
+Spark akan mendistribusikan proses clustering ke seluruh worker sehingga proses berjalan lebih cepat.
+
+---
+
+### 📌 Evaluasi Model
+
+Kualitas cluster dievaluasi menggunakan:
+
+```text
+Silhouette Score
+```
+
+Nilai Silhouette terbesar dipilih sebagai jumlah cluster terbaik.
+
+---
+
+### 📌 Visualisasi
+
+Pipeline menghasilkan beberapa visualisasi otomatis.
+
+- Silhouette Score
+- Distribusi Cluster
+- Multi-Dimensional Cluster Profile
+
+Visualisasi membantu memahami karakteristik masing-masing cluster.
+
+---
+
+### 📌 Business Insight
+
+Tahap terakhir adalah menghasilkan ringkasan analisis bisnis secara otomatis.
+
+Output berupa file:
+
+```text
+business_summary.txt
+```
+
+Laporan ini berisi interpretasi setiap cluster beserta rekomendasi strategi bisnis yang dapat digunakan perusahaan.
+
+---
+# 📊 Output Project
+
+Setelah pipeline selesai dijalankan, sistem akan menghasilkan beberapa file output secara otomatis pada folder `output/`.
+
+```text
+output/
+│
+├── cluster_result.csv
+├── silhouette_scores.csv
+├── silhouette_vs_k.png
+├── cluster_distribution.png
+├── multi_dimensional_cluster_profile.png
+└── business_summary.txt
+```
+
+## Penjelasan Output
 
 | File | Deskripsi |
 |------|-----------|
-| `output/cluster_result.csv` | Dataset lengkap dengan kolom `cluster` yang berisi label segmen (0, 1, 2, ...) untuk setiap baris data |
-| `output/silhouette_scores.csv` | Tabel evaluasi berisi kolom `K` dan `Silhouette` untuk setiap nilai K yang diuji (K=2 s/d K=6) |
-| `output/silhouette_vs_k.png` | Line chart yang memvisualisasikan hubungan Silhouette Score terhadap nilai K, dengan anotasi K optimal |
-| `output/cluster_distribution.png` | Bar chart yang menampilkan distribusi jumlah anggota pada setiap cluster |
-| `output/multi_dimensional_cluster_profile.png` | Heatmap yang menampilkan profil rata-rata fitur numerik per cluster |
-| `output/business_summary.txt` | Laporan insight bisnis yang mencakup persona, karakteristik, dan rekomendasi strategi per segmen |
+| `cluster_result.csv` | Menyimpan hasil segmentasi pengguna beserta label cluster yang diperoleh dari algoritma K-Means. |
+| `silhouette_scores.csv` | Berisi nilai Silhouette Score untuk setiap percobaan jumlah cluster (K). |
+| `silhouette_vs_k.png` | Grafik hubungan antara jumlah cluster dengan nilai Silhouette Score. |
+| `cluster_distribution.png` | Visualisasi distribusi jumlah anggota pada setiap cluster. |
+| `multi_dimensional_cluster_profile.png` | Visualisasi karakteristik masing-masing cluster berdasarkan fitur utama. |
+| `business_summary.txt` | Ringkasan hasil analisis beserta rekomendasi strategi bisnis. |
 
 ---
 
-### 📈 Hasil
+# 📈 Visualisasi Hasil
 
-- Nilai **K optimal** dipilih berdasarkan **Silhouette Score tertinggi** dari eksperimen K = 2, 3, 4, 5, 6.
-- Silhouette Score mengukur kualitas pemisahan antar cluster (rentang -1 hingga 1, semakin mendekati 1 semakin baik).
-- **StandardScaler** diterapkan sebelum K-Means untuk memastikan seluruh fitur berkontribusi secara seimbang dalam perhitungan jarak Euclidean.
-- Setiap cluster diberi **label persona** deskriptif dan **rekomendasi bisnis** yang actionable.
+Pipeline menghasilkan beberapa visualisasi yang membantu proses interpretasi hasil clustering.
+
+## 1. Silhouette Score
+
+Visualisasi ini digunakan untuk menentukan jumlah cluster terbaik.
+
+Semakin tinggi nilai **Silhouette Score**, semakin baik kualitas pemisahan antar cluster.
 
 ---
 
-### 👤 Author
+## 2. Cluster Distribution
 
-**Nama:** Rizki Hasan
+Grafik ini menunjukkan jumlah anggota pada setiap cluster.
 
-**Program Studi:** Teknik Informatika
+Visualisasi ini membantu mengetahui apakah distribusi cluster sudah cukup seimbang atau terdapat cluster yang terlalu dominan.
 
-**Universitas:** Universitas Bale Bandung
+---
 
-**Mata Kuliah:** Praktikum Big Data — UAS Tahun Akademik 2025/2026
+## 3. Multi-Dimensional Cluster Profile
+
+Visualisasi ini memperlihatkan karakteristik setiap cluster berdasarkan fitur-fitur utama.
+
+Melalui visualisasi ini dapat diketahui perbedaan perilaku antar kelompok pengguna, seperti:
+
+- Intensitas menonton
+- Status premium
+- Preferensi kategori konten
+- Penggunaan autoplay
+- Interaksi terhadap iklan
+
+---
+
+# 💼 Business Insight
+
+Hasil clustering memberikan informasi penting mengenai karakteristik setiap kelompok pengguna.
+
+Beberapa contoh pemanfaatannya antara lain:
+
+### 🎯 Personalisasi Konten
+
+Setiap cluster dapat diberikan rekomendasi konten yang berbeda sesuai dengan karakteristik perilakunya.
+
+---
+
+### 📢 Optimasi Strategi Pemasaran
+
+Promosi dapat difokuskan pada kelompok pengguna yang memiliki peluang konversi lebih tinggi sehingga biaya pemasaran menjadi lebih efisien.
+
+---
+
+### ⭐ Strategi Premium
+
+Pengguna aktif yang masih menggunakan layanan gratis dapat menjadi target utama untuk penawaran layanan premium.
+
+---
+
+### 📺 Optimasi Penayangan Iklan
+
+Perusahaan dapat menentukan strategi penempatan iklan berdasarkan karakteristik masing-masing cluster agar tidak mengurangi pengalaman pengguna.
+
+---
+
+### ❤️ Peningkatan Retensi Pengguna
+
+Cluster yang menunjukkan kecenderungan tidak aktif dapat diberikan promosi atau rekomendasi konten khusus untuk meningkatkan loyalitas pengguna.
+
+---
+
+# 🚀 Pengembangan Selanjutnya
+
+Beberapa pengembangan yang dapat dilakukan pada proyek ini antara lain:
+
+- Menambahkan algoritma clustering lain seperti Gaussian Mixture Model (GMM), DBSCAN, atau Bisecting K-Means.
+- Mengimplementasikan Spark Structured Streaming untuk analisis data secara real-time.
+- Mengembangkan dashboard interaktif menggunakan Streamlit atau Apache Superset.
+- Menambahkan evaluasi clustering menggunakan Davies-Bouldin Index dan Calinski-Harabasz Index.
+- Mengintegrasikan model rekomendasi (Recommendation System) berdasarkan hasil segmentasi pengguna.
+- Meningkatkan performa pipeline menggunakan optimasi konfigurasi Spark Cluster.
+
+---
+
+# 📌 Kesimpulan
+
+Proyek **Contextual Viewer Hybrid Segmentation** berhasil mengimplementasikan pipeline analisis Big Data secara end-to-end menggunakan Apache Spark MLlib pada lingkungan Hadoop.
+
+Melalui proses preprocessing, feature engineering, clustering, evaluasi, dan visualisasi, proyek ini mampu menghasilkan segmentasi pengguna berdasarkan perilaku menonton yang dapat dimanfaatkan sebagai dasar pengambilan keputusan bisnis.
+
+Pendekatan ini menunjukkan bahwa pemanfaatan teknologi Big Data memungkinkan proses analisis jutaan data dilakukan secara lebih cepat, efisien, dan scalable dibandingkan metode konvensional.
+
+---
+
+# 👥 Tim Pengembang
+
+Proyek ini merupakan tugas **Ujian Akhir Semester (UAS) Praktikum Big Data** yang dikerjakan secara berkelompok oleh mahasiswa Program Studi Teknik Informatika, Fakultas Teknologi Informasi, Universitas Bale Bandung (UNIBBA).
+
+| Nama |
+|------|
+| Rizki Hasan Fauzi | 
+| Fadhilah Tri Anugerah Putra Pamungkas | 
+| Tegar Bagus Permana | 
+| Soni Moch Leviansyah | 
+| Irfan Fauzi | 
+
+**Program Studi:** Teknik Informatika  
+**Fakultas:** Fakultas Teknologi Informasi  
+**Universitas:** Universitas Bale Bandung (UNIBBA)
+
+**Mata Kuliah:** Praktikum Big Data  
+**Topik:** Contextual Viewer Hybrid Segmentation using Distributed K-Means Clustering
+
+---
+
+# 🙏 Acknowledgements
+
+Ucapan terima kasih kepada:
+
+- Universitas Bale Bandung (UNIBBA)
+- Fakultas Teknologi Informasi
+- Dosen Mata Kuliah Praktikum Big Data
+- Apache Spark Community
+- Apache Hadoop Community
+- Docker Community
+- Seluruh pihak yang mendukung penyelesaian proyek ini.
+
+---
+
+# 📄 License
+
+Repository ini dibuat untuk keperluan akademik sebagai proyek **Ujian Akhir Semester Praktikum Big Data**.
+
+Penggunaan kode sumber untuk tujuan pembelajaran diperbolehkan dengan tetap mencantumkan atribusi kepada penulis.
+
+---
+
+## ⭐ Jika repository ini bermanfaat
+
+Apabila repository ini membantu proses pembelajaran atau menjadi referensi dalam pengembangan proyek Big Data, silakan berikan **⭐ Star** pada repository GitHub sebagai bentuk apresiasi.
+
+Terima kasih telah mengunjungi repository ini.
